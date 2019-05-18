@@ -2,78 +2,68 @@ import React, {Component} from 'react';
 import './App.css';
 import Resume from './components/resume'
 import axios from 'axios';
-import request from './utils/request'
+import _ from 'lodash';
 
+// import request from './utils/request'
+
+// https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes
+
+var request = axios.create({
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    baseURL: 'https://www.carqueryapi.com/api/0.3' 
+});
+  
+
+  
 
 
 class App extends Component {
   state = {
-    data: [],
+    data: [
+      // {"make_id":"alvis","make_display":"Alvis","make_is_common":"0","make_country":"UK"},
+      // {"make_id":"amc","make_display":"AMC","make_is_common":"0","make_country":"USA"},
+    ],
     xhr: null,
   } 
   
-  
-  
-  
   componentDidMount() {
-    // this.fetchData()
-    // axios.get('npm')  
-    // .then(response => {
-    //   console.log(response.data);
-    // })
-    // .catch(error=>{
-    //   console.log(error);
-    // });
-
-
-    
+    this.fetchData()
+    this.groupby(this.data,'make_country')
   }
   
   fetchData = async () => {
-    // const instance = axios.create({
-    // headers: {
-    //   'Content-Type': 'application/json'
-    // },
-    //   baseURL: 'https://www.carqueryapi.com/api/0.3'
-    // });  
-    // const res = await instance.get('/?callback=?&cmd=getMakes')
-    // this.setState({
-    //   data: res,
-    // })
+    // request.get('https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes')
+    //   .then(response => {
+    //     console.log(response.data)
+    //     this.setState({data: response.data})
+    //   })
+    //   .catch(console.log("reject"))
 
-        axios.get('https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes')
-    .then(response => {
-      const data = response.data.map(item=>{
-        return {
-        }
-          })
-      console.log(response.data);
-      this.setState({
-        data,
-      })
-    })
-    .catch(error => {
-      console.log(error);
-    });
-
-    // var request = require('request');
-    // request('https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes', function (error, response, body) {
-    //   console.log('error:', error); // Print the error if one occurred
-    //   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    //   console.log('body:', body); // Print the HTML for the Google homepage.
-    // });
-
-    // fetch('https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes', {'mode': 'no-cors'})
-    //   .then(data => data.json())
-    //   .then((data) => { this.setState({ data: data }) });
-     
-    // fetch("https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes")
-    //   .then(data => data.json())
-    //   .then((data) => { this.setState({ data}) });
-      
+      const resp = await request.get('https://www.carqueryapi.com/api/0.3/?callback=?&cmd=getMakes')
+      const data = resp.data
+      // const data = JSON.parse(resp.data)
+      console.log(data)
+      const scanner = data.split(/[()]+/).filter(e=>e);
+      console.log(scanner)
+      const objlst = JSON.parse(scanner[1]).Makes
+      console.log(objlst)
+      this.setState({data: objlst})
+      const groupbyCountry = await this.groupby(objlst,'make_country')
+      // const groupedd = await () => {_.groupBy(resp.data,'make_country')}
+      console.log(groupbyCountry)
 
   }
+  
+  groupby = (data,id) => {
+      const list = data
+      return _.groupBy(list,id)
+  }
+  
 
+ 
   
   render(){
     let image = 'https://via.placeholder.com/300x300.png';
