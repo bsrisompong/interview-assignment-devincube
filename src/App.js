@@ -49,12 +49,39 @@ class App extends Component {
       const scanner = data.split(/[()]+/).filter(e=>e);
       console.log(scanner)
       const objlst = JSON.parse(scanner[1]).Makes
+      console.log('objlst')
       console.log(objlst)
       this.setState({data: objlst})
-      const groupbyCountry = await this.groupby(objlst,'make_country')
-      // const groupedd = await () => {_.groupBy(resp.data,'make_country')}
+
+
+
+
+      // แต่ละประเทศ --> groupby make_country --> country key object
+      const groupbyCountry = this.groupby(objlst,'make_country')
       console.log(groupbyCountry)
 
+      
+      const numIdCountry = _.mapValues(groupbyCountry,(arr)=>{
+        return _.map(arr,(ob)=>{return ob.make_id}).length
+      })
+      console.log(numIdCountry)  // a. จำนวนยี่ห้อรถแต่ละประเทศ
+      const makeIdEachCountry = _.mapValues(groupbyCountry,(arr)=>{
+        return _.map(arr,(ob)=>{return ob.make_id})
+      })
+      console.log(makeIdEachCountry)  // b. แต่ละยี่ห้อที่แต่ละประเทศผลิค
+
+
+      var usa = groupbyCountry.USA
+      var usaId = _.map(usa, (value)=>{return value.make_id}) //c. ยี่ห้อรถแต่ละยี่ห้อที่ผลิตใน USA
+      console.log(usaId.length)  //c. จำนวนยี่ห้อที่ USA ผลิต
+      console.log(usaId)         //c. แต่ละยี่ห้อที่ USA ผลิต
+      
+      var europe = ["Italy","Germany","France","Romania","Netherlands","Sweden","Switzerland","Spain","Czech Republic","Austria","Serbia","Ukraine","Denmark"]
+      var filter = objlst.filter((itm)=>{return europe.includes(itm.make_country) })
+      // console.log(filter)
+      var europeId = _.map(filter, (value)=>{return value.make_id}) //d. ยี่ห้อรถแต่ละยี่ห้อที่ผลิตใน Europe
+      console.log(europeId.length)  //d. จำนวนยี่ห้อที่ Europe ผลิต
+      console.log(europeId)         //d. แต่ละยี่ห้อที่ Europe ผลิต
   }
   
   groupby = (data,id) => {
